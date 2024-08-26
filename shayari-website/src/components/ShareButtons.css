@@ -1,0 +1,11 @@
+.share-buttons a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 16px;
+  }
+  
+  .share-buttons a:hover {
+    text-decoration: underline;
+  }
+  

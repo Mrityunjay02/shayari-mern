@@ -1,0 +1,14 @@
+.App-header {
+    background-color: #f8f9fa; /* Light background color */
+    color: #333; /* Dark text color */
+    text-align: center; /* Center align text */
+    padding: 20px; /* Padding for spacing */
+    border-bottom: 1px solid #ddd; /* Light border at bottom */
+  }
+  
+  .App-header h1 {
+    margin: 0; /* Remove default margin */
+    font-size: 2rem; /* Larger font size */
+    font-family: 'Arial', sans-serif; /* Font family */
+  }
+  

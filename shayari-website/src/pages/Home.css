@@ -1,0 +1,21 @@
+/* Home.css */
+.home-container {
+    padding: 20px;
+    text-align: center;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+    font-family: 'Edu AU VIC WA NT Hand', cursive;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    font-size: 1.25rem;
+    color: #666;
+    margin: 10px 0;
+  }
+  
