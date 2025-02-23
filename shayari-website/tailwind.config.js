@@ -1,47 +1,45 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  darkMode: ["class"], // Enable dark mode using a class
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx,js,jsx}",
+    "./public/index.html",
   ],
   theme: {
     container: {
       center: true,
-      padding: "2rem", // Padding for the container
+      padding: "2rem",
       screens: {
-        "2xl": "1400px", // Max width for extra-large screens
+        "2xl": "1400px",
       },
     },
     extend: {
       colors: {
-        // Custom color palette using CSS variables for better theme flexibility
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#ef4444",
+          foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#a855f7",
+          foreground: "#ffffff",
         },
+        accent: {
+          DEFAULT: "#10b981",
+          foreground: "#ffffff",
+        },
+        background: "#ffffff",
+        foreground: "#0f172a",
+        muted: {
+          DEFAULT: "#f1f5f9",
+          foreground: "#64748b",
+        },
+        border: "#e2e8f0",
+        input: "#f1f5f9",
+        ring: "#e2e8f0",
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -52,13 +50,11 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
-      // Custom border radius for better design flexibility
       borderRadius: {
-        lg: "var(--radius)", // Customizable radius
+        lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      // Accordion animations for collapsible content
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -73,14 +69,12 @@ const config: Config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-      // Adding custom font families if needed in the future
       fontFamily: {
-        sans: ['"Arial"', 'sans-serif'],
-        serif: ['"Georgia"', 'serif'],
+        sans: ["Inter", "sans-serif"],
+        serif: ["Angsana New", "serif"],
+        cursive: ["Cedarville Cursive", "cursive"],
       },
     },
   },
-  plugins: [require("tailwindcss-animate")], // Include tailwind-animate plugin for animation utilities
+  plugins: [],
 };
-
-export default config;
