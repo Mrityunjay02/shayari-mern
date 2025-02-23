@@ -1,19 +1,18 @@
 /* About.css */
-.about-container {
+
+/* General Container Styling */
+#about-container {
+  font-family: 'Edu AU VIC WA NT Hand', cursive;
   padding: 20px;
-  max-width: 800px;
   margin: auto;
-  font-family: Arial, sans-serif;
+  max-width: 1200px; /* Limit width for large screens */
 }
 
-h2 {
+#about-container h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
-}
-
-p {
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  font-weight: 1000;
+  color: #333; /* Optional: Add a darker color for better contrast */
 }
 
 .mj-container {
@@ -24,8 +23,10 @@ p {
 .mj-text {
   font-size: 1.5rem;
   font-weight: bold;
+  color: #2C3E50;
 }
 
+/* Social Media Icons */
 .social-media-icons {
   display: flex;
   justify-content: center;
@@ -33,10 +34,31 @@ p {
   margin-top: 20px;
 }
 
+/* Social Media Icons */
 .social-media-icons a {
   color: #333;
+  text-decoration: none; /* Remove underline from links */
+  font-size: 18px; /* Adjust icon size smaller */
+  transition: color 0.3s ease; /* Smooth color transition */
 }
 
 .social-media-icons a:hover {
-  color: #007bff;
+  color: #007bff; /* Highlight color on hover */
+}
+
+
+/* Mobile and Tablet Responsive Styling */
+@media (max-width: 768px) {
+  #about-container h2 {
+    font-size: 1.6rem; /* Smaller font size for mobile */
+  }
+
+  .mj-container {
+    margin-top: 10px;
+  }
+
+  .social-media-icons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

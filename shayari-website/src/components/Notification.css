@@ -1,25 +1,52 @@
 .notification {
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    font-size: 1rem;
-    color: #fff;
-    text-align: center;
-  }
-  
-  .notification.info {
-    background-color: #2196F3; /* Blue */
-  }
-  
-  .notification.success {
-    background-color: #4CAF50; /* Green */
-  }
-  
-  .notification.warning {
-    background-color: #ff9800; /* Orange */
-  }
-  
-  .notification.error {
-    background-color: #f44336; /* Red */
-  }
-  
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #fff;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+
+.notification.info {
+  background-color: #2196F3; /* Blue */
+}
+
+.notification.success {
+  background-color: #4CAF50; /* Green */
+}
+
+.notification.warning {
+  background-color: #ff9800; /* Orange */
+}
+
+.notification.error {
+  background-color: #f44336; /* Red */
+}
+
+.notification span {
+  flex-grow: 1;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.close-btn:hover {
+  color: #ddd;
+}
+
+.notification.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}

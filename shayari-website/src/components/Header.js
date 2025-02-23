@@ -1,10 +1,10 @@
 import React from 'react';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ title = "Welcome to My Shayari Website" }) => {
   return (
-    <header className="App-header">
-      <h1>Welcome to My Shayari Website</h1>
+    <header className="App-header" aria-label="Main header of the page">
+      <h1>{title}</h1>
     </header>
   );
 };

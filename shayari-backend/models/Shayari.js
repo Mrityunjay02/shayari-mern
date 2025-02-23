@@ -1,11 +1,21 @@
 import mongoose from 'mongoose';
 
-// Define the schema   title, content, category
+// Define the schema
 const ShayariSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        default: ''
+    },
     content: {
         type: String,
         required: true
     },
+    author: {
+        type: String,
+        default: 'Mrityunjay Bhardwaj'  // Set default author name
+    }
+}, {
+    timestamps: true
 });
 
 // Create the model

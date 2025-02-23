@@ -10,7 +10,8 @@ import { loginUser, register } from "../controller/auth.controller.js"; // Impor
 
 const router = Router();
 
-// GET all shayaris
+// GET all shayaris with pagination
+// Example: /getShayari?page=1&limit=10
 router.get("/getShayari", getShayaris);
 
 // POST a new shayari
