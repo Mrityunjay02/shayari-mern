@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import { MongoClient, ServerApiVersion } from 'mongodb';
 import router from './routes/shayari.js';
 import { config } from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import mongoose from 'mongoose';
 
 // Get __dirname equivalent in ES Module
 const __filename = fileURLToPath(import.meta.url);
@@ -21,75 +21,48 @@ console.log('Environment Variables:', {
 });
 
 const app = express();
-app.use(cors());
-app.use(express.json()); // JSON Middleware
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+app.use(express.json());
 
 // MongoDB connection
-const mongoURI = process.env.MONGODB_URI; // Changed from MONGO_URI to MONGODB_URI
+const mongoURI = process.env.MONGODB_URI;
 if (!mongoURI) {
   console.error('❌ MongoDB URI is missing! Set MONGODB_URI in .env file.');
   process.exit(1);
 }
 
 console.log('🚀 Attempting to connect to MongoDB...');
-console.log('Connection string:', mongoURI);
 
-// Global MongoDB Client
-let mongoClient;
+// Connect using Mongoose
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 45000,
+  connectTimeoutMS: 30000,
+})
+.then(() => {
+  console.log('✅ Connected to MongoDB successfully!');
+})
+.catch((err) => {
+  console.error('❌ MongoDB Connection Error:', err);
+  process.exit(1);
+});
 
-const connectDB = async () => {
-  if (mongoClient) return mongoClient.db('shayariDB');
+// Handle MongoDB connection events
+mongoose.connection.on('connected', () => {
+  console.log('🎉 Mongoose connected to MongoDB');
+});
 
-  try {
-    console.log('Creating MongoDB client with options...');
-    mongoClient = new MongoClient(mongoURI, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      }
-    });
+mongoose.connection.on('error', (err) => {
+  console.error('❌ Mongoose connection error:', err);
+});
 
-    console.log('Attempting to connect...');
-    await mongoClient.connect();
-    console.log('✅ Connected to MongoDB successfully!');
-
-    // Test the connection with a simple command
-    const adminDb = mongoClient.db('admin');
-    await adminDb.command({ ping: 1 });
-    console.log('MongoDB server responded to ping!');
-
-    return mongoClient.db('shayariDB');
-  } catch (error) {
-    console.error('❌ MongoDB Connection Error Details:', {
-      name: error.name,
-      message: error.message,
-      code: error.code,
-      stack: error.stack,
-      // Additional error properties that might help diagnose the issue
-      errorLabels: error.errorLabels,
-      topologyVersion: error.topologyVersion,
-      connectionGeneration: error.connectionGeneration
-    });
-
-    // Additional error analysis
-    if (error.name === 'MongoServerSelectionError') {
-      console.error('Server Selection Error - This usually means:');
-      console.error('1. The MongoDB server is not reachable');
-      console.error('2. Network connectivity issues');
-      console.error('3. SSL/TLS certificate problems');
-      console.error('4. IP address not whitelisted in MongoDB Atlas');
-    }
-
-    process.exit(1);
-  }
-};
-
-// Initialize MongoDB Connection
-await connectDB().then(() => {
-  console.log('✅ Database connection established.');
-}).catch(err => {
-  console.error('❌ Failed to connect to the database:', err);
+mongoose.connection.on('disconnected', () => {
+  console.log('💔 Mongoose disconnected');
 });
 
 // API Routes
@@ -99,39 +72,26 @@ const DEFAULT_PORT = process.env.PORT || 8083;
 let port = parseInt(DEFAULT_PORT, 10);
 
 const startServer = (port) => {
-  try {
-    const server = app.listen(port, () => {
-      console.log(`🚀 Server is running on http://localhost:${port}`);
-    });
-
-    // Graceful Shutdown
-    process.on('SIGINT', async () => {
-      console.log('🛑 Shutting down server...');
-      await mongoClient?.close();
-      server.close(() => {
-        console.log('✅ Server closed.');
-        process.exit(0);
-      });
-    });
-
-    process.on('SIGTERM', async () => {
-      console.log('🛑 Received SIGTERM. Closing server...');
-      await mongoClient?.close();
-      server.close(() => {
-        console.log('✅ Server closed.');
-        process.exit(0);
-      });
-    });
-
-  } catch (error) {
-    if (error.code === 'EADDRINUSE') {
-      console.log(`❌ Port ${port} is already in use. Trying next port...`);
+  const server = app.listen(port, () => {
+    console.log(`🚀 Server is running on http://localhost:${port}`);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`⚠️ Port ${port} is busy, trying ${port + 1}`);
       startServer(port + 1);
     } else {
-      console.error('❌ Error starting server:', error);
+      console.error('❌ Server error:', err);
       process.exit(1);
     }
-  }
+  });
+
+  // Handle server shutdown
+  process.on('SIGTERM', () => {
+    console.log('Received SIGTERM signal. Closing server...');
+    server.close(() => {
+      console.log('Server closed.');
+      process.exit(0);
+    });
+  });
 };
 
 startServer(port);

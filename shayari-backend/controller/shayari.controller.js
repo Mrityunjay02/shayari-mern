@@ -3,78 +3,147 @@ import Shayari from '../models/Shayari.js';
 // Get all shayaris with pagination
 const getShayaris = async (req, res) => {
   try {
-    const { page = 1, limit = 10, category = 'All' } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 10);
+    const skip = (page - 1) * limit;
 
-    // Category filter
-    const query = category === 'All' ? {} : { category };
+    const [shayaris, total] = await Promise.all([
+      Shayari.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Shayari.countDocuments()
+    ]);
 
-    // Fetch shayaris with pagination
-    const shayaris = await Shayari.find(query)
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit));
-    
-    // Total shayaris count for pagination
-    const total = await Shayari.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
 
-    res.status(200).json({ shayaris, total, page, pages: totalPages });
+    res.status(200).json({
+      success: true,
+      shayaris,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    });
   } catch (error) {
-    console.error('Error fetching shayaris:', error);
-    res.status(500).json({ error: 'Error fetching shayaris' });
+    console.error('Error in getShayaris:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error fetching shayaris',
+      message: error.message
+    });
   }
 };
 
 // Add a new shayari
 const addShayaris = async (req, res) => {
-  const { content, title, author } = req.body;
-  if (!content) {
-    return res.status(400).json({ error: 'Content is required' });
-  }
   try {
-    const newShayari = new Shayari({ content, title, author });
-    await newShayari.save();
-    res.status(201).json(newShayari);
-  } catch (error) {
-    console.error('Error adding shayari:', error);
-    res.status(500).json({ error: 'Error adding shayari' });
-  }
-};
+    const { title, content, author } = req.body;
 
-// Delete a shayari by ID
-const deleteShayaris = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await Shayari.findByIdAndDelete(id);
-    if (!result) {
-      return res.status(404).json({ error: 'Shayari not found' });
+    if (!content) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content is required'
+      });
     }
-    res.status(200).json({ success: true, message: 'Shayari deleted successfully' });
+
+    const newShayari = new Shayari({
+      title: title || '',
+      content,
+      author: author || '_ Mrityunjay Bhardwaj'
+    });
+
+    const savedShayari = await newShayari.save();
+
+    res.status(201).json({
+      success: true,
+      shayari: savedShayari
+    });
   } catch (error) {
-    console.error('Error deleting shayari:', error);
-    res.status(500).json({ error: 'Error deleting shayari' });
+    console.error('Error in addShayaris:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error adding shayari',
+      message: error.message
+    });
   }
 };
 
-// Edit an existing shayari
-const editShayaris = async (req, res) => {
-  const { id } = req.params;
-  const { content, title, author } = req.body;
-  if (!content) {
-    return res.status(400).json({ error: 'Content is required' });
-  }
+// Delete a shayari
+const deleteShayaris = async (req, res) => {
   try {
+    const { id } = req.params;
+    const deletedShayari = await Shayari.findByIdAndDelete(id);
+
+    if (!deletedShayari) {
+      return res.status(404).json({
+        success: false,
+        error: 'Shayari not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Shayari deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error in deleteShayaris:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error deleting shayari',
+      message: error.message
+    });
+  }
+};
+
+// Edit a shayari
+const editShayaris = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content, author } = req.body;
+
+    if (!content) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content is required'
+      });
+    }
+
     const updatedShayari = await Shayari.findByIdAndUpdate(
       id,
-      { content, title, author },
+      {
+        title: title || '',
+        content,
+        author: author || '_ Mrityunjay Bhardwaj'
+      },
       { new: true }
     );
+
     if (!updatedShayari) {
-      return res.status(404).json({ error: 'Shayari not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Shayari not found'
+      });
     }
-    res.status(200).json(updatedShayari);
+
+    res.status(200).json({
+      success: true,
+      shayari: updatedShayari
+    });
   } catch (error) {
-    console.error('Error updating shayari:', error);
-    res.status(500).json({ error: 'Error updating shayari' });
+    console.error('Error in editShayaris:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error updating shayari',
+      message: error.message
+    });
   }
 };
 

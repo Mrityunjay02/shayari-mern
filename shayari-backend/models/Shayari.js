@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 const ShayariSchema = new mongoose.Schema({
     title: {
         type: String,
+        required: true,
         default: ''
     },
     content: {
@@ -12,11 +13,16 @@ const ShayariSchema = new mongoose.Schema({
     },
     author: {
         type: String,
-        default: 'Mrityunjay Bhardwaj'  // Set default author name
+        default: '_ Mrityunjay Bhardwaj'
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    versionKey: false // This removes __v field
 });
+
+// Add indexes for better query performance
+ShayariSchema.index({ createdAt: -1 });
+ShayariSchema.index({ title: 'text', content: 'text' });
 
 // Create the model
 const Shayari = mongoose.model('Shayari', ShayariSchema);
