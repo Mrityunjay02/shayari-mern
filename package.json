@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"cd shayari-backend && npm run dev\" \"cd shayari-website && npm start\""
+    "start-backend": "cd shayari-backend && npm run dev",
+    "start-frontend": "cd shayari-website && npm start"
   },
   "keywords": [],
   "author": "",
