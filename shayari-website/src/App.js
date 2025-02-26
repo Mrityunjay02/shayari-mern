@@ -10,6 +10,7 @@ import './styles.css';
 import debounce from 'lodash.debounce';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+
 const App = () => {
   const [shayaris, setShayaris] = useState([]);
   const [notification, setNotification] = useState('');
