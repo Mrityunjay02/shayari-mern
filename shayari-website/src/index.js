@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
-import '@fortawesome/fontawesome-free/css/all.min.css';  // Using the minified version
+// Remove FontAwesome CSS import and use components directly
 import App from './App';
 import './index.css'; // Import global styles if needed
 
