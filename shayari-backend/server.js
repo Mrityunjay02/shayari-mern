@@ -13,12 +13,19 @@ const __dirname = dirname(__filename);
 // Load environment variables
 config({ path: join(__dirname, '.env'), override: true });
 
-// Debug: Print all environment variables
-console.log('Environment Variables:', {
-  MONGODB_URI: process.env.MONGODB_URI,
-  PORT: process.env.PORT,
-  NODE_ENV: process.env.NODE_ENV
+// Debug: Print environment status (but not sensitive values)
+console.log('Environment Status:', {
+  MONGODB_URI: process.env.MONGODB_URI ? '✓ Set' : '✗ Missing',
+  PORT: process.env.PORT || '3000 (default)',
+  NODE_ENV: process.env.NODE_ENV || 'development'
 });
+
+if (!process.env.MONGODB_URI) {
+  console.error('\n❌ MongoDB URI is required! Please set MONGODB_URI environment variable.');
+  console.error('   If running locally: Add MONGODB_URI to your .env file');
+  console.error('   If using Render: Add MONGODB_URI in Environment settings\n');
+  process.exit(1);
+}
 
 const app = express();
 app.use(cors({
@@ -29,10 +36,6 @@ app.use(express.json());
 
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI;
-if (!mongoURI) {
-  console.error('❌ MongoDB URI is missing! Set MONGODB_URI in .env file.');
-  process.exit(1);
-}
 
 console.log('🚀 Attempting to connect to MongoDB...');
 
