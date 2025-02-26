@@ -8,7 +8,7 @@ import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles.css';
 import debounce from 'lodash.debounce';
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const App = () => {
   const [shayaris, setShayaris] = useState([]);
