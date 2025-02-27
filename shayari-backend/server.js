@@ -29,10 +29,21 @@ if (!process.env.MONGODB_URI) {
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://mjaypoetry.onrender.com'],
   credentials: true
 }));
 app.use(express.json());
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Welcome to Shayari API',
+    status: 'Server is running'
+  });
+});
+
+// API routes
+app.use('/api', router);
 
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI;
@@ -67,9 +78,6 @@ mongoose.connection.on('error', (err) => {
 mongoose.connection.on('disconnected', () => {
   console.log('💔 Mongoose disconnected');
 });
-
-// API Routes
-app.use('/shayari', router);
 
 const DEFAULT_PORT = process.env.PORT || 8083;
 let port = parseInt(DEFAULT_PORT, 10);
