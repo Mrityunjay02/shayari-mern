@@ -3,9 +3,12 @@ import Shayari from '../models/Shayari.js';
 // Get all shayaris with pagination
 const getShayaris = async (req, res) => {
   try {
+    console.log('🔍 Received request for shayaris');
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.max(1, parseInt(req.query.limit) || 10);
     const skip = (page - 1) * limit;
+    
+    console.log('📝 Query params:', { page, limit, skip });
 
     const [shayaris, total] = await Promise.all([
       Shayari.find()
@@ -15,6 +18,11 @@ const getShayaris = async (req, res) => {
         .lean(),
       Shayari.countDocuments()
     ]);
+    
+    console.log('📊 Query results:', { 
+      shayarisCount: shayaris.length, 
+      totalDocuments: total 
+    });
 
     const totalPages = Math.ceil(total / limit);
     const hasNextPage = page < totalPages;

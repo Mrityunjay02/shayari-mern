@@ -14,10 +14,10 @@ const LoginPage = () => {
     setLoading(true); // Set loading to true
 
     try {
-      const response = await axios.post('http://localhost:8083/shayari/login', { email, password });
+      const response = await axios.post('http://localhost:8083/api/login', { email, password });
       console.log(response);
       
-      localStorage.setItem('token', response.data.accessToken); // Store JWT in local storage
+      localStorage.setItem('token', response.data.token); // Store JWT in local storage
       navigate('/'); // Redirect to home page
     } catch (err) {
       console.log(err);

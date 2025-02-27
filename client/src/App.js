@@ -27,7 +27,7 @@ const App = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`http://localhost:8083/shayari/getShayari?page=${currentPage}&limit=10`);
+        const response = await fetch(`http://localhost:8083/api/getShayari?page=${currentPage}&limit=10`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -93,7 +93,7 @@ const App = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8083/shayari/deleteShayari/${id}`, {
+      const response = await fetch(`http://localhost:8083/api/deleteShayari/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
