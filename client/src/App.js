@@ -26,14 +26,14 @@ const App = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`http://localhost:8083/shayari/getShayari?page=${currentPage}&limit=10`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari?page=${currentPage}&limit=10`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
         if (Array.isArray(data.shayaris)) {
           setShayaris(data.shayaris);
-          setTotalPages(data.pages);  
+          setTotalPages(data.pagination.totalPages);  
           showNotification('Shayaris fetched successfully!');
         } else {
           setShayaris([]);
@@ -92,7 +92,7 @@ const App = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8083/shayari/deleteShayari/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ const App = () => {
           <li><Link to="/shayari" className="hover:text-red-600 transition-colors duration-300">My Shayari</Link></li>
           {isAdmin && (
             <>
-              <li><Link to="/shayariManagement" className="hover:text-red-600 transition-colors duration-300">Shayari Management</Link></li>
+              <li><Link to="/shayari-management" className="hover:text-red-600 transition-colors duration-300">Shayari Management</Link></li>
               <li><button onClick={handleLogout} className="hover:text-red-600 transition-colors duration-300">Logout</button></li>
             </>
           )}
@@ -195,7 +195,7 @@ const App = () => {
           } />
         
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/shayariManagement" element={
+          <Route path="/shayari-management" element={
             <ProtectedRoute isAdmin={isAdmin}>
               <AddShayariForm />
             </ProtectedRoute>

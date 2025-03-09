@@ -34,13 +34,13 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
       if (isEditing) {
         // Edit existing shayari
         response = await axios.put(
-          `http://localhost:8083/shayari/editShayari/${state.id}`,
+          `${process.env.REACT_APP_API_URL}/shayari/editShayari/${state.id}`,
           formData
         );
       } else {
         // Add new shayari
         response = await axios.post(
-          "http://localhost:8083/shayari/addShayari",
+          `${process.env.REACT_APP_API_URL}/shayari/addShayari`,
           formData
         );
       }
@@ -72,7 +72,7 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
     if (shayariToEdit && window.confirm("Are you sure you want to delete this shayari?")) {
       try {
         const response = await axios.delete(
-          `http://localhost:8083/shayari/delete/${shayariToEdit._id}`
+          `${process.env.REACT_APP_API_URL}/shayari/delete/${shayariToEdit._id}`
         );
         if (response.status === 200) {
           setMessage("Shayari deleted successfully!");
