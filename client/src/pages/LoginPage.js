@@ -16,7 +16,7 @@ const LoginPage = () => {
 
     try {
       console.log('Attempting login with API URL:', process.env.REACT_APP_API_URL);
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/shayari/login`, 
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/shayari/auth/login`, 
         { email, password },
         {
           headers: {
