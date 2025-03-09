@@ -25,7 +25,8 @@ app.use(cors({
   origin: [
     'https://shayari-mern.vercel.app',
     'https://shayari-mern-bw1w-lwlled0q3-mjays-projects.vercel.app',
-    'https://mjaypoetry.onrender.com'
+    'https://mjaypoetry.onrender.com',
+    /\.vercel\.app$/  // Allow all Vercel preview deployments
   ],
   credentials: true
 }));
