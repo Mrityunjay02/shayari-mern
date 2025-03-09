@@ -16,7 +16,6 @@ const LoginPage = () => {
 
     try {
       console.log('Attempting login with API URL:', process.env.REACT_APP_API_URL);
-      // Remove /shayari from the path since it's already in the API_URL
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, 
         { email, password },
         {
@@ -30,11 +29,11 @@ const LoginPage = () => {
       
       console.log('Login response:', response.data);
       
-      if (response.data && response.data.accessToken) {
-        localStorage.setItem('token', response.data.accessToken);
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
         navigate('/shayari-management');
       } else {
-        throw new Error('No access token received');
+        throw new Error('No token received');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -44,7 +43,7 @@ const LoginPage = () => {
         if (err.response.status === 401) {
           setError('Invalid credentials. Please check your email and password.');
         } else {
-          setError(`Login failed: ${err.response.data.message || 'Please try again later.'}`);
+          setError(`Login failed: ${err.response.data.error || 'Please try again later.'}`);
         }
       } else if (err.request) {
         console.error('No response received:', err.request);
