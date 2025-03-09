@@ -22,7 +22,13 @@ console.log('Environment Variables:', {
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://mjaypoetry.onrender.com'],
+  origin: [
+    'http://localhost:3000',
+    'https://mjaypoetry.onrender.com',
+    'https://shayari-mern.onrender.com',
+    'https://shayari-mern-bw1w-lwlled0q3-mjays-projects.vercel.app',
+    'https://shayari-mern.vercel.app'
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -72,8 +78,9 @@ const DEFAULT_PORT = process.env.PORT || 8083;
 let port = parseInt(DEFAULT_PORT, 10);
 
 const startServer = (port) => {
-  const server = app.listen(port, () => {
-    console.log(`🚀 Server is running on http://localhost:${port}`);
+  const server = app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Server is running on port ${port}`);
+    console.log(`📝 API endpoints available at /api/shayari`);
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       console.log(`⚠️ Port ${port} is busy, trying ${port + 1}`);

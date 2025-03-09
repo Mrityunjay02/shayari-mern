@@ -26,9 +26,12 @@ const App = () => {
       try {
         setLoading(true);
         setError(null);
+        console.log('API URL:', process.env.REACT_APP_API_URL); // Debug log
         const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari?page=${currentPage}&limit=10`);
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          const errorData = await response.text();
+          console.error('Server response:', errorData);
+          throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
         if (Array.isArray(data.shayaris)) {
@@ -36,12 +39,13 @@ const App = () => {
           setTotalPages(data.pagination.totalPages);  
           showNotification('Shayaris fetched successfully!');
         } else {
+          console.error('Invalid data format:', data);
           setShayaris([]);
-          setError('No shayaris found.');
+          setError('No shayaris found or invalid data format.');
         }
       } catch (error) {
         console.error('Error fetching shayaris:', error);
-        setError('Error fetching shayaris. Please try again later.');
+        setError(`Error fetching shayaris: ${error.message}`);
       } finally {
         setLoading(false);
       }
