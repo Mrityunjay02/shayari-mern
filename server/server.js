@@ -23,11 +23,9 @@ console.log('Environment Variables:', {
 const app = express();
 app.use(cors({
   origin: [
-    'http://localhost:3000',
-    'https://mjaypoetry.onrender.com',
-    'https://shayari-mern.onrender.com',
+    'https://shayari-mern.vercel.app',
     'https://shayari-mern-bw1w-lwlled0q3-mjays-projects.vercel.app',
-    'https://shayari-mern.vercel.app'
+    'https://mjaypoetry.onrender.com'
   ],
   credentials: true
 }));

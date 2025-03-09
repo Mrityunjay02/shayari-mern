@@ -14,7 +14,8 @@ const LoginPage = () => {
     setLoading(true); // Set loading to true
 
     try {
-      const response = await axios.post('http://localhost:8083/shayari/login', { email, password });
+      setLoading(true);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/shayari/login`, { email, password });
       console.log(response);
       
       localStorage.setItem('token', response.data.accessToken); // Store JWT in local storage
