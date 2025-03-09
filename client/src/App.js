@@ -21,6 +21,11 @@ const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Debug log for API URL
+  useEffect(() => {
+    console.log('Current API URL:', process.env.REACT_APP_API_URL);
+  }, []);
+
   const fetchShayaris = useCallback(
     debounce(async () => {
       try {
