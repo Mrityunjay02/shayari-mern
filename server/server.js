@@ -22,7 +22,7 @@ console.log('Environment Variables:', {
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://mjaypoetry.onrender.com'],
   credentials: true
 }));
 app.use(express.json());
@@ -66,7 +66,7 @@ mongoose.connection.on('disconnected', () => {
 });
 
 // API Routes
-app.use('/shayari', router);
+app.use('/api/shayari', router);
 
 const DEFAULT_PORT = process.env.PORT || 8083;
 let port = parseInt(DEFAULT_PORT, 10);
