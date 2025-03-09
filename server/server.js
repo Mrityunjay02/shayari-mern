@@ -72,8 +72,8 @@ mongoose.connection.on('disconnected', () => {
 });
 
 // API Routes
+app.use('/api/auth', authRouter); // Mount auth routes first
 app.use('/api/shayari', router);
-app.use('/api/auth', authRouter); // Mount auth routes separately
 
 const DEFAULT_PORT = process.env.PORT || 8083;
 let port = parseInt(DEFAULT_PORT, 10);

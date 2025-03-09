@@ -15,11 +15,10 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // Since REACT_APP_API_URL already includes /api/shayari
-      const loginUrl = process.env.REACT_APP_API_URL.replace('/api/shayari', '/api') + '/auth/login';
-      console.log('Attempting login with URL:', loginUrl);
+      const API_URL = process.env.REACT_APP_API_URL || 'https://mjaypoetry.onrender.com/api';
+      console.log('Using API URL:', API_URL);
       
-      const response = await axios.post(loginUrl, 
+      const response = await axios.post(`${API_URL}/auth/login`, 
         { email, password },
         {
           headers: {
