@@ -18,6 +18,7 @@ const App = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,6 +26,11 @@ const App = () => {
   useEffect(() => {
     console.log('Current API URL:', process.env.REACT_APP_API_URL);
   }, []);
+
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   const fetchShayaris = useCallback(
     debounce(async () => {
@@ -138,100 +144,147 @@ const App = () => {
 
   return (
     <div className="container min-h-screen flex flex-col">
-      <nav className="flex items-center justify-between mb-8 p-4">
-        <Link to="/" className="no-underline hover:opacity-80 transition-opacity duration-300">
-          <div className="logo text-3xl" style={{ 
-            fontFamily: "'Cedarville Cursive', cursive",
-            letterSpacing: '0.05em'
-          }}>
-            <span className="text-red-700">M</span>jay
-            <span className="text-red-700">P</span>oetry
-          </div>
-        </Link>
-        <ul className="flex space-x-6">
-          <li><Link to="/" className="hover:text-red-600 transition-colors duration-300">Home</Link></li>
-          <li><Link to="/about" className="hover:text-red-600 transition-colors duration-300">About</Link></li>
-          <li><Link to="/shayari" className="hover:text-red-600 transition-colors duration-300">My Shayari</Link></li>
-          {isAdmin && (
-            <>
-              <li><Link to="/shayari-management" className="hover:text-red-600 transition-colors duration-300">Shayari Management</Link></li>
-              <li><button onClick={handleLogout} className="hover:text-red-600 transition-colors duration-300">Logout</button></li>
-            </>
-          )}
-        </ul>
-      </nav>
+      <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <Link to="/" className="no-underline hover:opacity-80 transition-opacity duration-300">
+                <div className="logo text-2xl md:text-3xl" style={{ 
+                  fontFamily: "'Cedarville Cursive', cursive",
+                  letterSpacing: '0.05em'
+                }}>
+                  <span className="text-red-700">M</span>jay
+                  <span className="text-red-700">P</span>oetry
+                </div>
+              </Link>
+            </div>
 
-      <div className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/shayari" element={
-            <div>
-              <div className="text-center my-8">
-                <h2 className="text-5xl inline-block pb-2" 
-                    style={{ 
-                      fontFamily: "'Angsana New', serif",
-                      letterSpacing: '0.02em',
-                      lineHeight: '1.4'
-                    }}>
-                  <span className="text-red-600 hover:text-red-700 transition-colors duration-300">M</span>
-                  <span className="text-pink-500 hover:text-pink-600 transition-colors duration-300">y</span>
-                  <span className="mx-3"></span>
-                  <span className="text-purple-600 hover:text-purple-700 transition-colors duration-300">S</span>
-                  <span className="text-blue-500 hover:text-blue-600 transition-colors duration-300">h</span>
-                  <span className="text-indigo-500 hover:text-indigo-600 transition-colors duration-300">a</span>
-                  <span className="text-cyan-500 hover:text-cyan-600 transition-colors duration-300">y</span>
-                  <span className="text-teal-500 hover:text-teal-600 transition-colors duration-300">a</span>
-                  <span className="text-green-500 hover:text-green-600 transition-colors duration-300">r</span>
-                  <span className="text-emerald-500 hover:text-emerald-600 transition-colors duration-300">i</span>
-                </h2>
-                <div className="h-1 w-48 mx-auto mt-2 bg-gradient-to-r from-red-600 via-purple-600 to-emerald-500 rounded-full"></div>
-              </div>
-              {notification && <div className="notification">{notification}</div>}
-              {error && <div className="error">{error}</div>}
-              {loading ? (
-                <div className="loading-spinner">Loading...</div>
-              ) : Array.isArray(shayaris) && shayaris.length > 0 ? (
+            {/* Mobile menu button */}
+            <div className="flex items-center md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-red-600 hover:bg-gray-100 focus:outline-none"
+                aria-expanded="false"
+              >
+                <span className="sr-only">Open main menu</span>
+                {/* Menu icon */}
+                {!isMenuOpen ? (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                ) : (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            {/* Desktop menu */}
+            <div className="hidden md:flex md:items-center md:space-x-6">
+              <Link to="/" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Home</Link>
+              <Link to="/about" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">About</Link>
+              <Link to="/shayari" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">My Shayari</Link>
+              {isAdmin && (
                 <>
-                  {shayaris.map((shayari, index) => (
-                    <ShayariCard 
-                      key={index} 
-                      text={shayari.content} 
-                      title={shayari.title}
-                      author={shayari.author}
-                      id={shayari._id} 
-                      isAdmin={Boolean(localStorage.getItem('token'))} 
-                      onDelete={handleDelete}
-                      fetchShayaris={fetchShayaris}
-                    />
-                  ))}
-                  {/* Pagination Buttons */}
-                  <div className="pagination">
-                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-                  </div>
+                  <Link to="/shayari-management" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Shayari Management</Link>
+                  <button onClick={handleLogout} className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Logout</button>
                 </>
-              ) : (
-                <p>No shayaris available.</p>
               )}
             </div>
-          } />
+          </div>
+
+          {/* Mobile menu */}
+          <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`}>
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <Link to="/" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300">Home</Link>
+              <Link to="/about" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300">About</Link>
+              <Link to="/shayari" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300">My Shayari</Link>
+              {isAdmin && (
+                <>
+                  <Link to="/shayari-management" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300">Shayari Management</Link>
+                  <button onClick={handleLogout} className="text-gray-700 hover:text-red-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors duration-300">Logout</button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Add padding to account for fixed header */}
+      <div className="pt-16">
+        <div className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/shayari" element={
+              <div>
+                <div className="text-center my-8">
+                  <h2 className="text-5xl inline-block pb-2" 
+                      style={{ 
+                        fontFamily: "'Angsana New', serif",
+                        letterSpacing: '0.02em',
+                        lineHeight: '1.4'
+                      }}>
+                    <span className="text-red-600 hover:text-red-700 transition-colors duration-300">M</span>
+                    <span className="text-pink-500 hover:text-pink-600 transition-colors duration-300">y</span>
+                    <span className="mx-3"></span>
+                    <span className="text-purple-600 hover:text-purple-700 transition-colors duration-300">S</span>
+                    <span className="text-blue-500 hover:text-blue-600 transition-colors duration-300">h</span>
+                    <span className="text-indigo-500 hover:text-indigo-600 transition-colors duration-300">a</span>
+                    <span className="text-cyan-500 hover:text-cyan-600 transition-colors duration-300">y</span>
+                    <span className="text-teal-500 hover:text-teal-600 transition-colors duration-300">a</span>
+                    <span className="text-green-500 hover:text-green-600 transition-colors duration-300">r</span>
+                    <span className="text-emerald-500 hover:text-emerald-600 transition-colors duration-300">i</span>
+                  </h2>
+                  <div className="h-1 w-48 mx-auto mt-2 bg-gradient-to-r from-red-600 via-purple-600 to-emerald-500 rounded-full"></div>
+                </div>
+                {notification && <div className="notification">{notification}</div>}
+                {error && <div className="error">{error}</div>}
+                {loading ? (
+                  <div className="loading-spinner">Loading...</div>
+                ) : Array.isArray(shayaris) && shayaris.length > 0 ? (
+                  <>
+                    {shayaris.map((shayari, index) => (
+                      <ShayariCard 
+                        key={index} 
+                        text={shayari.content} 
+                        title={shayari.title}
+                        author={shayari.author}
+                        id={shayari._id} 
+                        isAdmin={Boolean(localStorage.getItem('token'))} 
+                        onDelete={handleDelete}
+                        fetchShayaris={fetchShayaris}
+                      />
+                    ))}
+                    {/* Pagination Buttons */}
+                    <div className="pagination">
+                      <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
+                      <span>Page {currentPage} of {totalPages}</span>
+                      <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
+                    </div>
+                  </>
+                ) : (
+                  <p>No shayaris available.</p>
+                )}
+              </div>
+            } />
         
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/shayari-management" element={
-            <ProtectedRoute isAdmin={isAdmin}>
-              <AddShayariForm />
-            </ProtectedRoute>
-          } />
-        </Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/shayari-management" element={
+              <ProtectedRoute isAdmin={isAdmin}>
+                <AddShayariForm />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </div>
       </div>
 
-      <footer className="mt-auto py-4 text-center border-t border-gray-200">
-        <p className="text-gray-600" style={{ fontFamily: "'Angsana New', serif", fontSize: '1.1rem' }}>
-          &copy; August 2024 MjayPoetry. All rights reserved.
-        </p>
-      </footer>
+      {notification && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+          {notification}
+        </div>
+      )}
     </div>
   );
 };
