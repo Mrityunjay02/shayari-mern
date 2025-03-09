@@ -11,25 +11,49 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true
+    setError('');
+    setLoading(true);
 
     try {
-      setLoading(true);
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/shayari/login`, { email, password });
-      console.log(response);
+      console.log('Attempting login with API URL:', process.env.REACT_APP_API_URL);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/shayari/login`, 
+        { email, password },
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
       
-      localStorage.setItem('token', response.data.accessToken); // Store JWT in local storage
-      navigate('/'); // Redirect to home page
-    } catch (err) {
-      console.log(err);
+      console.log('Login response:', response.data);
       
-      if (err.response && err.response.status === 401) {
-        setError('Invalid credentials. Please check your email and password.');
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem('token', response.data.accessToken);
+        navigate('/shayari-management');
       } else {
+        throw new Error('No access token received');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      
+      if (err.response) {
+        console.error('Error response:', err.response.data);
+        if (err.response.status === 401) {
+          setError('Invalid credentials. Please check your email and password.');
+        } else {
+          setError(`Login failed: ${err.response.data.message || 'Please try again later.'}`);
+        }
+      } else if (err.request) {
+        console.error('No response received:', err.request);
+        setError('No response from server. Please check your internet connection.');
+      } else {
+        console.error('Error details:', err.message);
         setError('Login failed. Please try again later.');
       }
     } finally {
-      setLoading(false); // Set loading to false
+      setLoading(false);
     }
   };
 
