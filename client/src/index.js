@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
-import './index.css'; // Import global styles if needed
+import './index.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Optional: Error boundary component
 class ErrorBoundary extends React.Component {
