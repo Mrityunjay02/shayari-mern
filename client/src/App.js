@@ -34,7 +34,14 @@ const App = () => {
         const apiUrl = `${process.env.REACT_APP_API_URL}/shayari?page=${currentPage}&limit=10`;
         console.log('Fetching from:', apiUrl);
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
         console.log('Response status:', response.status);
         
         if (!response.ok) {
@@ -46,10 +53,10 @@ const App = () => {
         const data = await response.json();
         console.log('Received data:', data);
         
-        if (Array.isArray(data.shayaris)) {
+        if (data && data.shayaris) {
           setShayaris(data.shayaris);
           setTotalPages(data.pagination.totalPages);
-          showNotification('Shayaris fetched successfully!');
+          setError(null);
         } else {
           console.error('Invalid data format:', data);
           setShayaris([]);
@@ -58,6 +65,7 @@ const App = () => {
       } catch (error) {
         console.error('Error fetching shayaris:', error);
         setError(`Error fetching shayaris: ${error.message}`);
+        setShayaris([]);
       } finally {
         setLoading(false);
       }
