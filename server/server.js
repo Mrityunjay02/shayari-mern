@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import router from './routes/shayari.js';
+import authRouter from './routes/auth.js'; // Import auth router
 import { config } from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -26,7 +27,7 @@ app.use(cors({
     'https://shayari-mern.vercel.app',
     'https://shayari-mern-bw1w-lwlled0q3-mjays-projects.vercel.app',
     'https://mjaypoetry.onrender.com',
-    /\.vercel\.app$/  // Allow all Vercel preview deployments
+    /^https:\/\/shayari-mern.*\.vercel\.app$/  // Allow all Vercel preview and production deployments
   ],
   credentials: true
 }));
@@ -72,6 +73,7 @@ mongoose.connection.on('disconnected', () => {
 
 // API Routes
 app.use('/api/shayari', router);
+app.use('/api/auth', authRouter); // Mount auth routes separately
 
 const DEFAULT_PORT = process.env.PORT || 8083;
 let port = parseInt(DEFAULT_PORT, 10);

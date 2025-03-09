@@ -15,8 +15,11 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      console.log('Attempting login with API URL:', process.env.REACT_APP_API_URL);
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, 
+      // Since REACT_APP_API_URL already includes /api/shayari
+      const loginUrl = process.env.REACT_APP_API_URL.replace('/api/shayari', '/api') + '/auth/login';
+      console.log('Attempting login with URL:', loginUrl);
+      
+      const response = await axios.post(loginUrl, 
         { email, password },
         {
           headers: {

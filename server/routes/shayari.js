@@ -4,9 +4,7 @@ import {
   deleteShayaris,
   getShayaris,
   editShayaris,
-
 } from "../controller/shayari.controller.js";
-import { loginUser, register } from "../controller/auth.controller.js"; // Import authentication controller
 
 const router = Router();
 
@@ -22,10 +20,5 @@ router.delete("/:id", deleteShayaris);
 
 // PATCH (Edit) a shayari
 router.put("/:id", editShayaris);
-
-// Authentication routes
-router.post("/auth/login", loginUser);
-router.post("/auth/register", register);
-
 
 export default router;
