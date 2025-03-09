@@ -31,17 +31,24 @@ const App = () => {
       try {
         setLoading(true);
         setError(null);
-        console.log('API URL:', process.env.REACT_APP_API_URL); // Debug log
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari?page=${currentPage}&limit=10`);
+        const apiUrl = `${process.env.REACT_APP_API_URL}/shayari?page=${currentPage}&limit=10`;
+        console.log('Fetching from:', apiUrl);
+        
+        const response = await fetch(apiUrl);
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
-          const errorData = await response.text();
-          console.error('Server response:', errorData);
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
           throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
         }
+
         const data = await response.json();
+        console.log('Received data:', data);
+        
         if (Array.isArray(data.shayaris)) {
           setShayaris(data.shayaris);
-          setTotalPages(data.pagination.totalPages);  
+          setTotalPages(data.pagination.totalPages);
           showNotification('Shayaris fetched successfully!');
         } else {
           console.error('Invalid data format:', data);
