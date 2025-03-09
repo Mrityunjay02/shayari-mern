@@ -87,27 +87,27 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
-      <div className="max-w-2xl w-full">
+    <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-6 sm:py-12 px-3 sm:px-4">
+      <div className="w-full max-w-2xl">
         {/* Card Container */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl overflow-hidden">
           {/* Top Decorative Bar */}
-          <div className="h-2 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500"></div>
+          <div className="h-1 sm:h-2 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500"></div>
 
           {/* Form Content */}
-          <div className="px-8 py-10">
+          <div className="px-4 sm:px-8 py-6 sm:py-10">
             <h2
-              className="text-3xl font-semibold text-center mb-8"
+              className="text-2xl sm:text-3xl font-semibold text-center mb-6 sm:mb-8"
               style={{ fontFamily: "'Dancing Script', cursive" }}
             >
               {isEditing ? "Edit Shayari" : "Create New Shayari"}
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {/* Title Field */}
               <div>
                 <label
-                  className="block text-gray-700 text-sm font-medium mb-2"
+                  className="block text-gray-700 text-sm font-medium mb-1.5 sm:mb-2"
                   htmlFor="title"
                 >
                   Title
@@ -118,11 +118,10 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 outline-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 outline-none text-base sm:text-lg"
                   placeholder="Enter shayari title"
                   style={{
                     fontFamily: "'Dancing Script', cursive",
-                    fontSize: "1.1rem",
                   }}
                   required
                 />
@@ -131,7 +130,7 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
               {/* Content Field */}
               <div>
                 <label
-                  className="block text-gray-700 text-sm font-medium mb-2"
+                  className="block text-gray-700 text-sm font-medium mb-1.5 sm:mb-2"
                   htmlFor="content"
                 >
                   Shayari Content
@@ -141,12 +140,11 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
                   name="content"
                   value={formData.content}
                   onChange={handleChange}
-                  rows="6"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 outline-none resize-none"
+                  rows="5"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 outline-none resize-none text-base sm:text-lg"
                   placeholder="Write your shayari here..."
                   style={{
                     fontFamily: "'Dancing Script', cursive",
-                    fontSize: "1.1rem",
                   }}
                   required
                 />
@@ -155,7 +153,7 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
               {/* Author Field */}
               <div>
                 <label
-                  className="block text-gray-700 text-sm font-medium mb-2"
+                  className="block text-gray-700 text-sm font-medium mb-1.5 sm:mb-2"
                   htmlFor="author"
                 >
                   Author
@@ -166,11 +164,10 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
                   name="author"
                   value={formData.author}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 outline-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors duration-200 outline-none text-base sm:text-lg"
                   placeholder="Enter author name"
                   style={{
                     fontFamily: "'Dancing Script', cursive",
-                    fontSize: "1.1rem",
                   }}
                   required
                 />
@@ -179,7 +176,7 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
               {/* Message Display */}
               {message && (
                 <div
-                  className={`text-center py-2 rounded-lg ${
+                  className={`text-center py-2 px-3 rounded-lg text-sm sm:text-base ${
                     message.includes("success")
                       ? "text-green-600 bg-green-50"
                       : "text-red-600 bg-red-50"
@@ -189,32 +186,37 @@ const AddShayariForm = ({ shayariToEdit, onShayariUpdated }) => {
                 </div>
               )}
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-red-600 to-purple-600 text-white rounded-lg hover:opacity-90 transform hover:-translate-y-0.5 transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50"
-              >
-                {loading ? "Adding Shayari..." : isEditing ? "Update Shayari" : "Add Shayari"}
-              </button>
-              {shayariToEdit && (
+              {/* Action Buttons */}
+              <div className="space-y-3 sm:space-y-4 pt-2">
+                {/* Submit Button */}
                 <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="w-full py-3 px-4 bg-red-600 text-white rounded-lg hover:opacity-90 transform hover:-translate-y-0.5 transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2.5 sm:py-3 px-4 bg-gradient-to-r from-red-600 to-purple-600 text-white rounded-lg hover:opacity-90 transform hover:-translate-y-0.5 transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 text-sm sm:text-base"
                 >
-                  Delete Shayari
+                  {loading ? "Adding Shayari..." : isEditing ? "Update Shayari" : "Add Shayari"}
                 </button>
-              )}
+
+                {/* Delete Button */}
+                {shayariToEdit && (
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="w-full py-2.5 sm:py-3 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm sm:text-base"
+                  >
+                    Delete Shayari
+                  </button>
+                )}
+              </div>
             </form>
           </div>
         </div>
 
         {/* Bottom Decorative Elements */}
-        <div className="mt-4 flex justify-center space-x-4 opacity-30">
-          <div className="w-2 h-2 rounded-full bg-red-500"></div>
-          <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+        <div className="mt-4 flex justify-center space-x-3 opacity-30">
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500"></div>
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-purple-500"></div>
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500"></div>
         </div>
       </div>
     </div>
