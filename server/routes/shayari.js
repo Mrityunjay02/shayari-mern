@@ -11,21 +11,21 @@ import { loginUser, register } from "../controller/auth.controller.js"; // Impor
 const router = Router();
 
 // GET all shayaris with pagination
-// Example: /getShayari?page=1&limit=10
-router.get("/getShayari", getShayaris);
+// Example: /api/shayari?page=1&limit=10
+router.get("/", getShayaris);
 
 // POST a new shayari
-router.post("/addShayari", addShayaris);
+router.post("/", addShayaris);
 
 // DELETE a shayari
-router.delete("/deleteShayari/:id", deleteShayaris);
+router.delete("/:id", deleteShayaris);
 
 // PATCH (Edit) a shayari
-router.put("/editShayari/:id", editShayaris);
+router.put("/:id", editShayaris);
 
-// POST login
-router.post("/login", loginUser);
-router.post("/register", register);
+// Authentication routes
+router.post("/auth/login", loginUser);
+router.post("/auth/register", register);
 
 
 export default router;
