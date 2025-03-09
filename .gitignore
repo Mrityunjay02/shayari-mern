@@ -1,0 +1,5 @@
+node_modules/
+.env
+shayari-backend/.vscode/
+shayari-website/node_modules
+.vscode/
