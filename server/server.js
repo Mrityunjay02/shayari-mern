@@ -22,16 +22,25 @@ console.log('Environment Variables:', {
 });
 
 const app = express();
+
+// CORS configuration
 app.use(cors({
   origin: [
+    'http://localhost:3000',
+    'https://shayari-mern-1vq3w5g33-mjays-projects.vercel.app',
     'https://shayari-mern.vercel.app',
-    'https://shayari-mern-bw1w-lwlled0q3-mjays-projects.vercel.app',
-    'https://mjaypoetry.onrender.com',
-    /^https:\/\/shayari-mern.*\.vercel\.app$/  // Allow all Vercel preview and production deployments
+    'https://mjaypoetry.onrender.com'
   ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
+
 app.use(express.json());
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
+});
 
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI;
