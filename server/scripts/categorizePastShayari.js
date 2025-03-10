@@ -11,6 +11,9 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Use production MongoDB URI
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://your-production-uri';
+
 // Keyword patterns for each category
 const categoryPatterns = {
     [SHAYARI_CATEGORIES.ISHQ]: [
@@ -93,7 +96,9 @@ const generateTags = (content, title = '') => {
     const emotions = [
         'ishq', 'dard', 'dosti', 'zindagi', 'himmat',
         'pyaar', 'bewafa', 'tanhai', 'intezaar', 'yaadein',
-        'fitrat', 'roohani', 'khushi', 'gham', 'umeed'
+        'fitrat', 'roohani', 'khushi', 'gham', 'umeed',
+        'sukh', 'dukh', 'prem', 'virodh', 'sangharsh',
+        'jeevan', 'mritu', 'satya', 'asatya', 'nishtha'
     ];
 
     emotions.forEach(emotion => {
@@ -117,7 +122,7 @@ const generateTags = (content, title = '') => {
 const categorizeAllShayari = async () => {
     try {
         // Connect to MongoDB
-        await mongoose.connect(process.env.MONGODB_URI);
+        await mongoose.connect(MONGODB_URI);
         console.log('Connected to MongoDB');
 
         // Get all Shayari
