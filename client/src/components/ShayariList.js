@@ -1,65 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import ShayariCard from './ShayariCard';
-import { toast } from 'react-hot-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilter, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 
-const ShayariList = ({ isAdmin }) => {
+const ShayariList = () => {
   const [shayaris, setShayaris] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [categories, setCategories] = useState([]);
 
-  // Fetch shayaris from the API
+  useEffect(() => {
+    fetchShayaris();
+  }, [searchTerm, selectedCategory]);
+
   const fetchShayaris = async () => {
     try {
-      let url = `${process.env.REACT_APP_API_URL}/shayari`;
-      const queryParams = [];
-      
-      if (selectedCategory) {
-        queryParams.push(`category=${selectedCategory}`);
-      }
-      if (searchTerm) {
-        queryParams.push(`search=${encodeURIComponent(searchTerm)}`);
-      }
-      
-      if (queryParams.length > 0) {
-        url += `?${queryParams.join('&')}`;
-      }
+      let url = `${process.env.REACT_APP_API_URL}/shayari?`;
+      if (searchTerm) url += `search=${encodeURIComponent(searchTerm)}&`;
+      if (selectedCategory) url += `category=${encodeURIComponent(selectedCategory)}`;
 
       const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch shayaris');
-      }
-      
       const data = await response.json();
-      setShayaris(data);
-    } catch (error) {
-      console.error('Error fetching shayaris:', error);
-      toast.error('Failed to load shayaris');
+      
+      if (data.success) {
+        setShayaris(data.shayaris);
+        setCategories(data.categories || []);
+      } else {
+        setError('Failed to fetch shayaris');
+      }
+    } catch (err) {
+      setError('Network error occurred');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchShayaris();
-  }, [selectedCategory, searchTerm]);
-
-  const handleDelete = async (shayariId) => {
+  const handleLike = async (id) => {
     try {
-      setShayaris(prevShayaris => prevShayaris.filter(s => s._id !== shayariId));
-      toast.success('Shayari deleted successfully');
-    } catch (error) {
-      console.error('Error deleting shayari:', error);
-      toast.error('Failed to delete shayari');
-      // Refresh the list to ensure consistency
-      fetchShayaris();
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari/${id}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        fetchShayaris(); // Refresh the list to get updated likes
+      }
+    } catch (err) {
+      console.error('Error liking shayari:', err);
     }
-  };
-
-  const handleEdit = (shayari) => {
-    // Navigate to edit page or show edit modal
-    // This will be implemented based on your routing setup
-    console.log('Edit shayari:', shayari);
   };
 
   if (loading) {
@@ -70,46 +61,103 @@ const ShayariList = ({ isAdmin }) => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Search and Filter Section */}
-      <div className="mb-8 flex flex-col sm:flex-row gap-4">
-        {/* Search Input */}
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search shayaris..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-          />
+      <div className="mb-8 space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Search Bar */}
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Search shayaris..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 pl-10 pr-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+            />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            />
+          </div>
+
+          {/* Filter Toggle Button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faFilter} />
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
         </div>
 
-        {/* Category Filter */}
-        <div className="w-full sm:w-64">
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-          >
-            <option value="">All Categories</option>
-            <option value="Ishq">Ishq</option>
-            <option value="Dard">Dard</option>
-            <option value="Dosti">Dosti</option>
-            <option value="Zindagi">Zindagi</option>
-            <option value="Motivational">Motivational</option>
-            <option value="Romantic">Romantic</option>
-            <option value="Bewafa">Bewafa</option>
-            <option value="Tanhai">Tanhai</option>
-            <option value="Intezaar">Intezaar</option>
-            <option value="Mohabbat">Mohabbat</option>
-            <option value="Yaadein">Yaadein</option>
-            <option value="Ghazal">Ghazal</option>
-            <option value="Fitrat">Fitrat</option>
-            <option value="Roohani">Roohani</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+        {/* Category Filters */}
+        {showFilters && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedCategory('')}
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                  !selectedCategory
+                    ? 'bg-rose-500 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-rose-500 hover:text-white'
+                }`}
+              >
+                All
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => setSelectedCategory(cat.value)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    selectedCategory === cat.value
+                      ? 'bg-rose-500 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-rose-500 hover:text-white'
+                  }`}
+                >
+                  {cat.value} ({cat.count})
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Active Filters Display */}
+        {(searchTerm || selectedCategory) && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Active Filters:</span>
+            {searchTerm && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-sm">
+                Search: {searchTerm}
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {selectedCategory && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-sm">
+                Category: {selectedCategory}
+                <button
+                  onClick={() => setSelectedCategory('')}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Shayari Grid */}
@@ -118,9 +166,7 @@ const ShayariList = ({ isAdmin }) => {
           <ShayariCard
             key={shayari._id}
             shayari={shayari}
-            isAdmin={isAdmin}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
+            onLike={handleLike}
           />
         ))}
       </div>
@@ -128,8 +174,9 @@ const ShayariList = ({ isAdmin }) => {
       {/* Empty State */}
       {shayaris.length === 0 && (
         <div className="text-center py-12">
-          <h3 className="text-xl text-gray-600">No shayaris found</h3>
-          <p className="text-gray-500 mt-2">Try adjusting your search or filters</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg">
+            No shayaris found. Try adjusting your filters.
+          </p>
         </div>
       )}
     </div>

@@ -1,172 +1,139 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShare, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faShare, faCopy, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { toast, Toaster } from 'react-hot-toast';
 
-// Category color mappings for gradient backgrounds
-const categoryStyles = {
-  Ishq: 'from-rose-500 to-pink-500',
-  Dard: 'from-purple-500 to-indigo-500',
-  Dosti: 'from-blue-500 to-cyan-500',
-  Zindagi: 'from-teal-500 to-emerald-500',
-  Motivational: 'from-green-500 to-lime-500',
-  Romantic: 'from-pink-500 to-rose-500',
-  Bewafa: 'from-violet-500 to-purple-500',
-  Tanhai: 'from-indigo-500 to-blue-500',
-  Intezaar: 'from-cyan-500 to-teal-500',
-  Mohabbat: 'from-rose-500 to-pink-500',
-  Yaadein: 'from-amber-500 to-yellow-500',
-  Ghazal: 'from-emerald-500 to-green-500',
-  Fitrat: 'from-lime-500 to-emerald-500',
-  Roohani: 'from-blue-500 to-indigo-500',
-  Other: 'from-gray-500 to-slate-500'
+const categoryColors = {
+  'Ishq': 'from-pink-500 to-red-500',
+  'Dard': 'from-purple-500 to-indigo-500',
+  'Dosti': 'from-green-500 to-teal-500',
+  'Zindagi': 'from-yellow-500 to-orange-500',
+  'Motivational': 'from-blue-500 to-indigo-500',
+  'Romantic': 'from-red-400 to-pink-500',
+  'Bewafa': 'from-gray-600 to-gray-800',
+  'Tanhai': 'from-blue-400 to-purple-500',
+  'Intezaar': 'from-amber-400 to-orange-500',
+  'Mohabbat': 'from-rose-400 to-red-500',
+  'Yaadein': 'from-violet-400 to-purple-500',
+  'Ghazal': 'from-emerald-400 to-green-500',
+  'Fitrat': 'from-cyan-400 to-blue-500',
+  'Roohani': 'from-indigo-400 to-violet-500',
+  'Other': 'from-gray-400 to-gray-600'
 };
 
-const ShayariCard = ({ shayari, isAdmin, onDelete, onEdit }) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(shayari.likes || 0);
+const ShayariCard = ({ shayari, onLike }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
-  const handleLike = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari/${shayari._id}/like`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        setIsLiked(!isLiked);
-        setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-      }
-    } catch (error) {
-      console.error('Error liking shayari:', error);
-    }
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    onLike(shayari._id);
+    toast.success('Shayari liked!');
   };
 
   const handleShare = async () => {
-    const textToShare = `${shayari.title}\n\n${shayari.content}\n\n- ${shayari.author}`;
-    
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: shayari.title,
-          text: textToShare,
-          url: window.location.href
-        });
-      } else {
-        await navigator.clipboard.writeText(textToShare);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
+      await navigator.share({
+        title: shayari.title,
+        text: `${shayari.content}\n\n${shayari.author}`,
+        url: window.location.href
+      });
+      toast.success('Shared successfully!');
+    } catch (err) {
+      toast.error('Sharing failed. Try copying instead.');
     }
   };
 
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this shayari?')) {
-      onDelete(shayari._id);
-    }
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`${shayari.content}\n\n${shayari.author}`);
+    toast.success('Copied to clipboard!');
   };
+
+  const truncatedContent = shayari.content.length > 150 && !isExpanded 
+    ? shayari.content.substring(0, 150) + '...' 
+    : shayari.content;
 
   return (
-    <div className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800 mb-6 transform hover:-translate-y-1">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-6 mb-6">
+      <Toaster position="bottom-center" />
+      
+      {/* Header */}
+      <div className="flex justify-between items-start mb-4">
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white">{shayari.title}</h2>
+        <div className="relative">
+          <button 
+            onClick={() => setShowOptions(!showOptions)}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+          >
+            <FontAwesomeIcon icon={faEllipsisV} className="text-gray-500 dark:text-gray-400" />
+          </button>
+          
+          {showOptions && (
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10">
+              <button 
+                onClick={handleShare}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              >
+                Share
+              </button>
+              <button 
+                onClick={handleCopy}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              >
+                Copy
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Category Badge */}
-      <div className="absolute top-4 right-4 z-10">
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white bg-gradient-to-r ${categoryStyles[shayari.category] || categoryStyles.Other} shadow-lg`}>
+      <div className="mb-4">
+        <span className={`inline-block px-3 py-1 text-sm font-semibold text-white rounded-full bg-gradient-to-r ${categoryColors[shayari.category] || categoryColors['Other']}`}>
           {shayari.category}
         </span>
       </div>
 
-      {/* Card Content */}
-      <div className="p-6">
-        {/* Title */}
-        <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-white font-urdu">
-          {shayari.title}
-        </h3>
-
-        {/* Content */}
-        <div className={`relative ${isExpanded ? '' : 'max-h-32 overflow-hidden'}`}>
-          <p className="text-lg text-gray-600 dark:text-gray-300 whitespace-pre-wrap font-urdu leading-relaxed">
-            {shayari.content}
-          </p>
-          {!isExpanded && shayari.content.length > 150 && (
-            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white dark:from-gray-800 to-transparent" />
-          )}
-        </div>
-
-        {/* Read More Button */}
+      {/* Content */}
+      <div className="mb-4">
+        <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+          {truncatedContent}
+        </p>
         {shayari.content.length > 150 && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 text-rose-500 hover:text-rose-600 font-medium text-sm focus:outline-none"
+            className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 mt-2 text-sm font-medium"
           >
             {isExpanded ? 'Read less' : 'Read more'}
           </button>
         )}
+      </div>
 
-        {/* Tags */}
-        {shayari.tags && shayari.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {shayari.tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Author and Actions */}
-        <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-500 dark:text-gray-400 italic">
-            {shayari.author}
-          </div>
-
-          <div className="flex items-center space-x-4">
-            {/* Like Button */}
-            <button
-              onClick={handleLike}
-              className={`flex items-center space-x-1 text-sm ${
-                isLiked ? 'text-rose-500' : 'text-gray-500 dark:text-gray-400'
-              } hover:text-rose-500 transition-colors duration-200`}
-            >
-              <FontAwesomeIcon icon={faHeart} className={`text-lg ${isLiked ? 'animate-bounce' : ''}`} />
-              <span>{likeCount}</span>
-            </button>
-
-            {/* Share Button */}
-            <button
-              onClick={handleShare}
-              className="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors duration-200"
-              title={isCopied ? 'Copied!' : 'Share'}
-            >
-              <FontAwesomeIcon icon={faShare} className="text-lg" />
-            </button>
-
-            {/* Admin Actions */}
-            {isAdmin && (
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onEdit(shayari)}
-                  className="text-blue-500 hover:text-blue-600 transition-colors duration-200"
-                >
-                  <FontAwesomeIcon icon={faEdit} className="text-lg" />
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="text-red-500 hover:text-red-600 transition-colors duration-200"
-                >
-                  <FontAwesomeIcon icon={faTrash} className="text-lg" />
-                </button>
-              </div>
-            )}
-          </div>
+      {/* Footer */}
+      <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={handleLike}
+            className={`flex items-center space-x-1 ${isLiked ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'} hover:text-red-500 transition-colors`}
+          >
+            <FontAwesomeIcon icon={faHeart} className={`text-xl transform ${isLiked ? 'scale-110' : ''} transition-transform`} />
+            <span>{shayari.likes || 0}</span>
+          </button>
+          <button 
+            onClick={handleShare}
+            className="text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+          >
+            <FontAwesomeIcon icon={faShare} className="text-xl" />
+          </button>
+          <button 
+            onClick={handleCopy}
+            className="text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors"
+          >
+            <FontAwesomeIcon icon={faCopy} className="text-xl" />
+          </button>
         </div>
+        <p className="text-gray-500 dark:text-gray-400 text-sm italic">{shayari.author}</p>
       </div>
     </div>
   );
