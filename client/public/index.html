@@ -5,23 +5,58 @@
   <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mjay Poetry</title>
   <link rel="stylesheet" href="styles.css"> 
   <style>
-    @font-face {
-      font-family: 'Angsana New';
-      src: local('Angsana New');
+    :root {
+      --primary-gradient: linear-gradient(to right, #FF6B6B, #FF8E53);
+      --secondary-gradient: linear-gradient(to right, #6B66FF, #4ECDC4);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%);
+      min-height: 100vh;
+      font-family: 'Amiri', serif;
+    }
+
+    #root {
+      min-height: 100vh;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #FF6B6B, #FF8E53);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(to bottom, #FF5252, #FF7043);
+    }
+
+    /* Smooth Transitions */
+    * {
+      transition: all 0.3s ease;
+    }
+
+    /* Selection Color */
+    ::selection {
+      background: rgba(255, 107, 107, 0.2);
+      color: #FF6B6B;
     }
   </style>
-  <style>
-    @font-face {
-      font-family: 'Bell MT';
-      src: local('Bell MT');
-    }
-  </style>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Edu+AU+VIC+WA+NT+Hand:wght@400..700&family=Gupter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="root"></div> 
