@@ -3,7 +3,7 @@ import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import Home from './pages/Home';
 import About from './pages/About';
 import AddShayariForm from './components/AddShayariForm';
-import ShayariCard from './components/ShayariCard';
+import ShayariList from './components/ShayariList';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles.css';
@@ -11,13 +11,8 @@ import debounce from 'lodash.debounce';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const App = () => {
-  const [shayaris, setShayaris] = useState([]);
   const [notification, setNotification] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,64 +27,10 @@ const App = () => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  const fetchShayaris = useCallback(
-    debounce(async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const apiUrl = `${process.env.REACT_APP_API_URL}/shayari?page=${currentPage}&limit=10`;
-        console.log('Fetching from:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-        console.log('Response status:', response.status);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error response:', errorText);
-          throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('Received data:', data);
-        
-        if (data && data.shayaris) {
-          setShayaris(data.shayaris);
-          setTotalPages(data.pagination.totalPages);
-          setError(null);
-        } else {
-          console.error('Invalid data format:', data);
-          setShayaris([]);
-          setError('No shayaris found or invalid data format.');
-        }
-      } catch (error) {
-        console.error('Error fetching shayaris:', error);
-        setError(`Error fetching shayaris: ${error.message}`);
-        setShayaris([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 500),
-    [currentPage]
-  );
-
   useEffect(() => {
-    fetchShayaris();
     const token = localStorage.getItem('token');
     if (token) {
       setIsAdmin(true);
-    }
-  }, [location.pathname, currentPage]);
-
-  useEffect(() => {
-    if (location.pathname === '/') {
-      setCurrentPage(1);
     }
   }, [location.pathname]);
 
@@ -107,38 +48,7 @@ const App = () => {
     if (token) {
       localStorage.removeItem('token');
       setIsAdmin(false);
-      setShayaris([]);
-      setCurrentPage(1);
-      setTotalPages(0);
       navigate('/');
-    }
-  };
-
-  const handlePageChange = (page) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete shayari');
-      }
-
-      showNotification('Shayari deleted successfully!');
-      fetchShayaris();
-    } catch (error) {
-      console.error('Error deleting shayari:', error);
-      showNotification('Error deleting shayari. Please try again.');
     }
   };
 
@@ -199,31 +109,13 @@ const App = () => {
           {/* Mobile menu */}
           <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`}>
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link to="/" 
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >Home</Link>
-              <Link to="/about" 
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >About</Link>
-              <Link to="/shayari" 
-                className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >My Shayari</Link>
+              <Link to="/" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Home</Link>
+              <Link to="/about" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">About</Link>
+              <Link to="/shayari" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Shayari</Link>
               {isAdmin && (
                 <>
-                  <Link to="/shayari-management" 
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                    onClick={() => setIsMenuOpen(false)}
-                  >Shayari Management</Link>
-                  <button 
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium"
-                  >Logout</button>
+                  <Link to="/shayari-management" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Shayari Management</Link>
+                  <button onClick={handleLogout} className="text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium">Logout</button>
                 </>
               )}
             </div>
@@ -231,78 +123,36 @@ const App = () => {
         </div>
       </nav>
 
-      {/* Main content with proper spacing */}
-      <main className="flex-1 mt-16 container mx-auto px-4 py-6">
+      {/* Main content */}
+      <div className="flex-grow pt-16">
+        {notification && (
+          <div className="fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
+            {notification}
+          </div>
+        )}
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/shayari" element={
-            <div>
-              <div className="text-center my-8">
-                <h2 className="text-5xl inline-block pb-2" 
-                    style={{ 
-                      fontFamily: "'Angsana New', serif",
-                      letterSpacing: '0.02em',
-                      lineHeight: '1.4'
-                    }}>
-                  <span className="text-red-600 hover:text-red-700 transition-colors duration-300">M</span>
-                  <span className="text-pink-500 hover:text-pink-600 transition-colors duration-300">y</span>
-                  <span className="mx-3"></span>
-                  <span className="text-purple-600 hover:text-purple-700 transition-colors duration-300">S</span>
-                  <span className="text-blue-500 hover:text-blue-600 transition-colors duration-300">h</span>
-                  <span className="text-indigo-500 hover:text-indigo-600 transition-colors duration-300">a</span>
-                  <span className="text-cyan-500 hover:text-cyan-600 transition-colors duration-300">y</span>
-                  <span className="text-teal-500 hover:text-teal-600 transition-colors duration-300">a</span>
-                  <span className="text-green-500 hover:text-green-600 transition-colors duration-300">r</span>
-                  <span className="text-emerald-500 hover:text-emerald-600 transition-colors duration-300">i</span>
-                </h2>
-                <div className="h-1 w-48 mx-auto mt-2 bg-gradient-to-r from-red-600 via-purple-600 to-emerald-500 rounded-full"></div>
-              </div>
-              {notification && <div className="notification">{notification}</div>}
-              {error && <div className="error">{error}</div>}
-              {loading ? (
-                <div className="loading-spinner">Loading...</div>
-              ) : Array.isArray(shayaris) && shayaris.length > 0 ? (
-                <>
-                  {shayaris.map((shayari, index) => (
-                    <ShayariCard 
-                      key={index} 
-                      text={shayari.content} 
-                      title={shayari.title}
-                      author={shayari.author}
-                      id={shayari._id} 
-                      isAdmin={Boolean(localStorage.getItem('token'))} 
-                      onDelete={handleDelete}
-                      fetchShayaris={fetchShayaris}
-                    />
-                  ))}
-                  {/* Pagination Buttons */}
-                  <div className="pagination">
-                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-                  </div>
-                </>
-              ) : (
-                <p>No shayaris available.</p>
-              )}
-            </div>
-          } />
-      
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/shayari-management" element={
-            <ProtectedRoute isAdmin={isAdmin}>
-              <AddShayariForm />
-            </ProtectedRoute>
-          } />
+          <Route path="/login" element={<LoginPage setIsAdmin={setIsAdmin} />} />
+          <Route path="/shayari" element={<ShayariList isAdmin={isAdmin} />} />
+          <Route
+            path="/shayari-management"
+            element={
+              <ProtectedRoute isAdmin={isAdmin}>
+                <AddShayariForm showNotification={showNotification} />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      </main>
+      </div>
 
-      {notification && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
-          {notification}
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-4 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p>&copy; {new Date().getFullYear()} MjayPoetry. All rights reserved.</p>
         </div>
-      )}
+      </footer>
     </div>
   );
 };
