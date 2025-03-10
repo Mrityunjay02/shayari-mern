@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
+  faInstagram,
   faFacebook, 
   faTwitter,
   faWhatsapp,
-  faTelegram
+  faLinkedin,
+  faSnapchat,
+  faPinterest,
+  faTelegram,
+  faThreads
 } from '@fortawesome/free-brands-svg-icons';
 import { faShare } from '@fortawesome/free-solid-svg-icons';
 
@@ -42,6 +47,12 @@ const ShayariCard = ({ text, author = "Unknown", title = "", isAdmin, id, onDele
       label: "WhatsApp"
     },
     {
+      icon: faInstagram,
+      url: `https://www.instagram.com/share?text=${getShareText()}`,
+      color: "bg-gradient-to-r from-[#405DE6] via-[#C13584] to-[#FD1D1D]",
+      label: "Instagram"
+    },
+    {
       icon: faFacebook,
       url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${getShareText()}`,
       color: "bg-[#3b5998]",
@@ -54,10 +65,34 @@ const ShayariCard = ({ text, author = "Unknown", title = "", isAdmin, id, onDele
       label: "Twitter"
     },
     {
+      icon: faLinkedin,
+      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(title || 'Shayari')}&summary=${getShareText()}`,
+      color: "bg-[#0077B5]",
+      label: "LinkedIn"
+    },
+    {
+      icon: faSnapchat,
+      url: `https://www.snapchat.com/share?text=${getShareText()}`,
+      color: "bg-[#FFFC00]",
+      label: "Snapchat"
+    },
+    {
+      icon: faPinterest,
+      url: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(window.location.href)}&description=${getShareText()}`,
+      color: "bg-[#E60023]",
+      label: "Pinterest"
+    },
+    {
       icon: faTelegram,
       url: `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${getShareText()}`,
       color: "bg-[#0088cc]",
       label: "Telegram"
+    },
+    {
+      icon: faThreads,
+      url: `https://www.threads.net/share?text=${getShareText()}`,
+      color: "bg-black",
+      label: "Threads"
     }
   ];
 
@@ -137,20 +172,22 @@ const ShayariCard = ({ text, author = "Unknown", title = "", isAdmin, id, onDele
               className="absolute right-0 sm:right-0 bottom-full mb-3 w-full sm:w-64 bg-white rounded-xl shadow-xl py-3 z-50 border border-gray-100 transform transition-all duration-200 ease-in-out animate-slideIn"
             >
               <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 absolute top-0 left-0 right-0 rounded-t-xl"></div>
-              {socialLinks.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center px-3 sm:px-4 py-2 sm:py-3 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <div className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full ${link.color}`}>
-                    <FontAwesomeIcon icon={link.icon} className="text-white text-base sm:text-lg" />
-                  </div>
-                  <span className="ml-3 text-gray-700 font-medium text-sm sm:text-base">{link.label}</span>
-                </a>
-              ))}
+              <div className="grid grid-cols-3 gap-2 p-2">
+                {socialLinks.map((link, index) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center justify-center p-2 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                  >
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full ${link.color}`}>
+                      <FontAwesomeIcon icon={link.icon} className={`text-white text-lg sm:text-xl ${link.icon === faSnapchat ? 'text-black' : ''}`} />
+                    </div>
+                    <span className="mt-1 text-xs text-gray-600 font-medium">{link.label}</span>
+                  </a>
+                ))}
+              </div>
             </div>
           )}
         </div>
