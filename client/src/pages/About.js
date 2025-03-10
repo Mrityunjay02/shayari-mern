@@ -71,7 +71,7 @@ const About = () => {
           <FontAwesomeIcon icon={faThreads} />
           <span className="social-label">Threads</span>
         </a>
-        <a href="https://accounts.snapchat.com/v2/welcome" target="_blank" rel="noopener noreferrer" className="social-link snapchat">
+        <a href="https://www.snapchat.com/add/mjay_02" target="_blank" rel="noopener noreferrer" className="social-link snapchat">
           <FontAwesomeIcon icon={faSnapchat} />
           <span className="social-label">Snapchat</span>
         </a>
