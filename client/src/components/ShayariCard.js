@@ -1,230 +1,172 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faWhatsapp,
-  faFacebook,
-  faTwitter,
-  faInstagram,
-  faTelegram,
-  faSnapchat
-} from '@fortawesome/free-brands-svg-icons';
-import { faShare, faHeart, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
+import { faHeart, faShare, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 
-const ShayariCard = ({ shayari, onEdit, onDelete, isAdmin }) => {
-  const [showShareMenu, setShowShareMenu] = useState(false);
+// Category color mappings for gradient backgrounds
+const categoryStyles = {
+  Ishq: 'from-rose-500 to-pink-500',
+  Dard: 'from-purple-500 to-indigo-500',
+  Dosti: 'from-blue-500 to-cyan-500',
+  Zindagi: 'from-teal-500 to-emerald-500',
+  Motivational: 'from-green-500 to-lime-500',
+  Romantic: 'from-pink-500 to-rose-500',
+  Bewafa: 'from-violet-500 to-purple-500',
+  Tanhai: 'from-indigo-500 to-blue-500',
+  Intezaar: 'from-cyan-500 to-teal-500',
+  Mohabbat: 'from-rose-500 to-pink-500',
+  Yaadein: 'from-amber-500 to-yellow-500',
+  Ghazal: 'from-emerald-500 to-green-500',
+  Fitrat: 'from-lime-500 to-emerald-500',
+  Roohani: 'from-blue-500 to-indigo-500',
+  Other: 'from-gray-500 to-slate-500'
+};
+
+const ShayariCard = ({ shayari, isAdmin, onDelete, onEdit }) => {
   const [isLiked, setIsLiked] = useState(false);
-  const [likes, setLikes] = useState(shayari.likes || 0);
-  const navigate = useNavigate();
-
-  const handleEdit = () => {
-    if (onEdit) {
-      onEdit(shayari);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this shayari?')) {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari/${shayari._id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        if (response.ok) {
-          if (onDelete) {
-            onDelete(shayari._id);
-          }
-          toast.success('Shayari deleted successfully!');
-        } else {
-          throw new Error('Failed to delete shayari');
-        }
-      } catch (error) {
-        console.error('Error deleting shayari:', error);
-        toast.error('Failed to delete shayari');
-      }
-    }
-  };
+  const [likeCount, setLikeCount] = useState(shayari.likes || 0);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleLike = async () => {
-    if (!isLiked) {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari/${shayari._id}/like`, {
-          method: 'POST'
-        });
-        
-        if (response.ok) {
-          setIsLiked(true);
-          setLikes(prev => prev + 1);
-          toast.success('Shayari liked!');
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/shayari/${shayari._id}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         }
-      } catch (error) {
-        console.error('Error liking shayari:', error);
-        toast.error('Failed to like shayari');
+      });
+
+      if (response.ok) {
+        setIsLiked(!isLiked);
+        setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
       }
+    } catch (error) {
+      console.error('Error liking shayari:', error);
     }
   };
 
-  const socialLinks = [
-    {
-      label: 'WhatsApp',
-      icon: faWhatsapp,
-      url: `https://wa.me/?text=${encodeURIComponent(`${shayari.content}\n\n- ${shayari.author}`)}`,
-      color: 'bg-green-500'
-    },
-    {
-      label: 'Facebook',
-      icon: faFacebook,
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
-      color: 'bg-blue-600'
-    },
-    {
-      label: 'Twitter',
-      icon: faTwitter,
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${shayari.content}\n\n- ${shayari.author}`)}`,
-      color: 'bg-sky-500'
-    },
-    {
-      label: 'Instagram',
-      icon: faInstagram,
-      url: `https://www.instagram.com/`,
-      color: 'bg-gradient-to-r from-purple-500 to-pink-500'
-    },
-    {
-      label: 'Telegram',
-      icon: faTelegram,
-      url: `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`${shayari.content}\n\n- ${shayari.author}`)}`,
-      color: 'bg-blue-500'
-    },
-    {
-      label: 'Snapchat',
-      icon: faSnapchat,
-      url: 'https://www.snapchat.com/',
-      color: 'bg-yellow-400'
+  const handleShare = async () => {
+    const textToShare = `${shayari.title}\n\n${shayari.content}\n\n- ${shayari.author}`;
+    
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: shayari.title,
+          text: textToShare,
+          url: window.location.href
+        });
+      } else {
+        await navigator.clipboard.writeText(textToShare);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
     }
-  ];
-
-  const getCategoryGradient = (category) => {
-    const gradients = {
-      'Ishq': 'from-rose-500 to-pink-500',
-      'Dard': 'from-blue-600 to-indigo-600',
-      'Dosti': 'from-green-500 to-emerald-500',
-      'Zindagi': 'from-yellow-500 to-amber-500',
-      'Motivational': 'from-purple-500 to-violet-500',
-      'Romantic': 'from-red-500 to-rose-500',
-      'Bewafa': 'from-gray-600 to-slate-600',
-      'Tanhai': 'from-indigo-500 to-blue-500',
-      'Intezaar': 'from-amber-500 to-orange-500',
-      'Mohabbat': 'from-pink-500 to-rose-500',
-      'Yaadein': 'from-violet-500 to-purple-500',
-      'Ghazal': 'from-teal-500 to-emerald-500',
-      'Fitrat': 'from-green-600 to-teal-600',
-      'Roohani': 'from-indigo-400 to-purple-400',
-      'Other': 'from-gray-500 to-gray-600'
-    };
-    return gradients[category] || gradients['Other'];
   };
 
-  if (!shayari || !shayari.content) {
-    return null;
-  }
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to delete this shayari?')) {
+      onDelete(shayari._id);
+    }
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-102 hover:shadow-xl">
+    <div className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800 mb-6 transform hover:-translate-y-1">
       {/* Category Badge */}
-      <div className={`absolute top-0 right-0 px-3 py-1 m-2 text-sm font-semibold text-white rounded-full bg-gradient-to-r ${getCategoryGradient(shayari.category)}`}>
-        {shayari.category}
+      <div className="absolute top-4 right-4 z-10">
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white bg-gradient-to-r ${categoryStyles[shayari.category] || categoryStyles.Other} shadow-lg`}>
+          {shayari.category}
+        </span>
       </div>
 
+      {/* Card Content */}
       <div className="p-6">
         {/* Title */}
-        <h3 className="text-xl font-bold mb-2 font-urdu">{shayari.title}</h3>
+        <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-white font-urdu">
+          {shayari.title}
+        </h3>
 
         {/* Content */}
-        <p className="text-gray-700 mb-4 font-urdu whitespace-pre-line">{shayari.content}</p>
-
-        {/* Author */}
-        <p className="text-gray-500 italic mb-2">{shayari.author}</p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {shayari.tags && shayari.tags.map((tag, index) => (
-            <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
-              #{tag}
-            </span>
-          ))}
+        <div className={`relative ${isExpanded ? '' : 'max-h-32 overflow-hidden'}`}>
+          <p className="text-lg text-gray-600 dark:text-gray-300 whitespace-pre-wrap font-urdu leading-relaxed">
+            {shayari.content}
+          </p>
+          {!isExpanded && shayari.content.length > 150 && (
+            <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white dark:from-gray-800 to-transparent" />
+          )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex gap-4">
+        {/* Read More Button */}
+        {shayari.content.length > 150 && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-2 text-rose-500 hover:text-rose-600 font-medium text-sm focus:outline-none"
+          >
+            {isExpanded ? 'Read less' : 'Read more'}
+          </button>
+        )}
+
+        {/* Tags */}
+        {shayari.tags && shayari.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {shayari.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Author and Actions */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-gray-500 dark:text-gray-400 italic">
+            {shayari.author}
+          </div>
+
+          <div className="flex items-center space-x-4">
             {/* Like Button */}
             <button
               onClick={handleLike}
-              disabled={isLiked}
-              className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors ${
-                isLiked ? 'text-rose-500 bg-rose-50' : 'text-gray-500 hover:text-rose-500 hover:bg-rose-50'
-              }`}
+              className={`flex items-center space-x-1 text-sm ${
+                isLiked ? 'text-rose-500' : 'text-gray-500 dark:text-gray-400'
+              } hover:text-rose-500 transition-colors duration-200`}
             >
-              <FontAwesomeIcon icon={faHeart} className="text-lg" />
-              <span>{likes}</span>
+              <FontAwesomeIcon icon={faHeart} className={`text-lg ${isLiked ? 'animate-bounce' : ''}`} />
+              <span>{likeCount}</span>
             </button>
 
             {/* Share Button */}
             <button
-              onClick={() => setShowShareMenu(!showShareMenu)}
-              className="flex items-center gap-2 px-3 py-1 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-colors"
+              onClick={handleShare}
+              className="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors duration-200"
+              title={isCopied ? 'Copied!' : 'Share'}
             >
               <FontAwesomeIcon icon={faShare} className="text-lg" />
-              <span>Share</span>
             </button>
-          </div>
 
-          {/* Admin Actions */}
-          {isAdmin && (
-            <div className="flex gap-4">
-              <button
-                onClick={handleEdit}
-                className="flex items-center gap-2 px-3 py-1 rounded-full text-gray-500 hover:text-blue-500 hover:bg-blue-50 transition-colors"
-              >
-                <FontAwesomeIcon icon={faEdit} className="text-lg" />
-                <span>Edit</span>
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex items-center gap-2 px-3 py-1 rounded-full text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"
-              >
-                <FontAwesomeIcon icon={faTrash} className="text-lg" />
-                <span>Delete</span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Share Menu */}
-        {showShareMenu && (
-          <div className="absolute right-0 bottom-full mb-2 bg-white rounded-lg shadow-xl p-4 z-50">
-            <div className="grid grid-cols-3 gap-4">
-              {socialLinks.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-2 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+            {/* Admin Actions */}
+            {isAdmin && (
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => onEdit(shayari)}
+                  className="text-blue-500 hover:text-blue-600 transition-colors duration-200"
                 >
-                  <div className={`w-10 h-10 flex items-center justify-center rounded-full ${link.color}`}>
-                    <FontAwesomeIcon icon={link.icon} className="text-white text-xl" />
-                  </div>
-                  <span className="text-sm text-gray-600">{link.label}</span>
-                </a>
-              ))}
-            </div>
+                  <FontAwesomeIcon icon={faEdit} className="text-lg" />
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="text-red-500 hover:text-red-600 transition-colors duration-200"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="text-lg" />
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
