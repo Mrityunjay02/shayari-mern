@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faInstagram, 
-  faTwitter, 
-  faLinkedin, 
-  faSnapchat, 
-  faPinterest, 
-  faThreads 
+  faFacebook, 
+  faTwitter,
+  faWhatsapp,
+  faTelegram
 } from '@fortawesome/free-brands-svg-icons';
-import { faEnvelope, faShare } from '@fortawesome/free-solid-svg-icons';
+import { faShare } from '@fortawesome/free-solid-svg-icons';
 
 const ShayariCard = ({ text, author = "Unknown", title = "", isAdmin, id, onDelete }) => {
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -25,48 +23,41 @@ const ShayariCard = ({ text, author = "Unknown", title = "", isAdmin, id, onDele
     }
   };
 
+  const getShareText = () => {
+    let shareText = text;
+    if (title) {
+      shareText = `${title}\n\n${text}`;
+    }
+    if (author !== "Unknown") {
+      shareText = `${shareText}\n\n- ${author}`;
+    }
+    return encodeURIComponent(shareText);
+  };
+
   const socialLinks = [
     {
-      icon: faInstagram,
-      url: "https://instagram.com/mrityunjay2864",
-      color: "bg-[#E4405F]",
-      label: "Instagram"
+      icon: faWhatsapp,
+      url: `https://wa.me/?text=${getShareText()}`,
+      color: "bg-[#25D366]",
+      label: "WhatsApp"
+    },
+    {
+      icon: faFacebook,
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${getShareText()}`,
+      color: "bg-[#3b5998]",
+      label: "Facebook"
     },
     {
       icon: faTwitter,
-      url: "https://twitter.com/mrityunjay2864",
+      url: `https://twitter.com/intent/tweet?text=${getShareText()}`,
       color: "bg-[#1DA1F2]",
       label: "Twitter"
     },
     {
-      icon: faLinkedin,
-      url: "https://www.linkedin.com/in/mrityunjay-bhardwaj-8b4a04220",
-      color: "bg-[#0077B5]",
-      label: "LinkedIn"
-    },
-    {
-      icon: faSnapchat,
-      url: "https://www.snapchat.com/add/mrityunjay2864",
-      color: "bg-[#FFFC00]",
-      label: "Snapchat"
-    },
-    {
-      icon: faEnvelope,
-      url: "mailto:mjay.bhardwaj02@gmail.com",
-      color: "bg-[#D44638]",
-      label: "Email"
-    },
-    {
-      icon: faPinterest,
-      url: "https://www.pinterest.com/mrityunjay2864",
-      color: "bg-[#BD081C]",
-      label: "Pinterest"
-    },
-    {
-      icon: faThreads,
-      url: "https://www.threads.net/@mrityunjay2864",
-      color: "bg-black",
-      label: "Threads"
+      icon: faTelegram,
+      url: `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${getShareText()}`,
+      color: "bg-[#0088cc]",
+      label: "Telegram"
     }
   ];
 
