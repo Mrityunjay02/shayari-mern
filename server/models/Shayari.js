@@ -47,10 +47,29 @@ const ShayariSchema = new mongoose.Schema({
     likes: {
         type: Number,
         default: 0
+    },
+    favorites: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    views: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true,
     versionKey: false // This removes __v field
+});
+
+// Update timestamps on save
+ShayariSchema.pre('save', function(next) {
+    this.updatedAt = new Date();
+    next();
+});
+
+// Virtual for favorite count
+ShayariSchema.virtual('favoriteCount').get(function() {
+    return this.favorites.length;
 });
 
 // Add indexes for better query performance

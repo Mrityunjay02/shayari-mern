@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faShare, faCopy, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faShare, faCopy, faEllipsisV, faStar } from '@fortawesome/free-solid-svg-icons';
 import { toast, Toaster } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const categoryColors = {
   'Ishq': 'from-pink-500 to-red-500',
@@ -21,15 +22,23 @@ const categoryColors = {
   'Other': 'from-gray-400 to-gray-600'
 };
 
-const ShayariCard = ({ shayari, onLike }) => {
+const ShayariCard = ({ shayari, onLike, onFavorite }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
     onLike(shayari._id);
     toast.success('Shayari liked!');
+  };
+
+  const handleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    onFavorite(shayari._id);
+    toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites');
   };
 
   const handleShare = async () => {
@@ -55,87 +64,136 @@ const ShayariCard = ({ shayari, onLike }) => {
     : shayari.content;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-6 mb-6">
+    <motion.div
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-6 mb-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.02 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+    >
       <Toaster position="bottom-center" />
       
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white">{shayari.title}</h2>
+        <motion.h2 
+          className="text-xl font-bold text-gray-800 dark:text-white"
+          animate={{ scale: isHovered ? 1.05 : 1 }}
+        >
+          {shayari.title}
+        </motion.h2>
         <div className="relative">
-          <button 
+          <motion.button 
             onClick={() => setShowOptions(!showOptions)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            whileTap={{ scale: 0.95 }}
           >
             <FontAwesomeIcon icon={faEllipsisV} className="text-gray-500 dark:text-gray-400" />
-          </button>
+          </motion.button>
           
-          {showOptions && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10">
-              <button 
-                onClick={handleShare}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+          <AnimatePresence>
+            {showOptions && (
+              <motion.div 
+                className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
               >
-                Share
-              </button>
-              <button 
-                onClick={handleCopy}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-              >
-                Copy
-              </button>
-            </div>
-          )}
+                <motion.button 
+                  onClick={handleShare}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  whileHover={{ x: 5 }}
+                >
+                  Share
+                </motion.button>
+                <motion.button 
+                  onClick={handleCopy}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  whileHover={{ x: 5 }}
+                >
+                  Copy
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
       {/* Category Badge */}
-      <div className="mb-4">
+      <motion.div 
+        className="mb-4"
+        animate={{ scale: isHovered ? 1.05 : 1 }}
+      >
         <span className={`inline-block px-3 py-1 text-sm font-semibold text-white rounded-full bg-gradient-to-r ${categoryColors[shayari.category] || categoryColors['Other']}`}>
           {shayari.category}
         </span>
-      </div>
+      </motion.div>
 
       {/* Content */}
-      <div className="mb-4">
+      <motion.div 
+        className="mb-4"
+        animate={{ y: isExpanded ? 10 : 0 }}
+      >
         <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line leading-relaxed">
           {truncatedContent}
         </p>
         {shayari.content.length > 150 && (
-          <button
+          <motion.button
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 mt-2 text-sm font-medium"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {isExpanded ? 'Read less' : 'Read more'}
-          </button>
+          </motion.button>
         )}
-      </div>
+      </motion.div>
 
       {/* Footer */}
       <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-4">
-          <button 
+          <motion.button 
             onClick={handleLike}
             className={`flex items-center space-x-1 ${isLiked ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'} hover:text-red-500 transition-colors`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <FontAwesomeIcon icon={faHeart} className={`text-xl transform ${isLiked ? 'scale-110' : ''} transition-transform`} />
+            <FontAwesomeIcon icon={faHeart} className={`text-xl ${isLiked ? 'animate-bounce' : ''}`} />
             <span>{shayari.likes || 0}</span>
-          </button>
-          <button 
+          </motion.button>
+          <motion.button 
+            onClick={handleFavorite}
+            className={`flex items-center space-x-1 ${isFavorite ? 'text-yellow-500' : 'text-gray-500 dark:text-gray-400'} hover:text-yellow-500 transition-colors`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <FontAwesomeIcon icon={faStar} className={`text-xl ${isFavorite ? 'animate-spin' : ''}`} />
+          </motion.button>
+          <motion.button 
             onClick={handleShare}
             className="text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
             <FontAwesomeIcon icon={faShare} className="text-xl" />
-          </button>
-          <button 
+          </motion.button>
+          <motion.button 
             onClick={handleCopy}
             className="text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400 transition-colors"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
           >
             <FontAwesomeIcon icon={faCopy} className="text-xl" />
-          </button>
+          </motion.button>
         </div>
-        <p className="text-gray-500 dark:text-gray-400 text-sm italic">{shayari.author}</p>
+        <motion.p 
+          className="text-gray-500 dark:text-gray-400 text-sm italic"
+          animate={{ opacity: isHovered ? 1 : 0.8 }}
+        >
+          {shayari.author}
+        </motion.p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
